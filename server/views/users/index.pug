@@ -1,15 +1,15 @@
 extends ../layouts/application.pug
 
 block content
-  table.table.table-striped
+  table.table.table-striped.text-white.bg-secondary
     thead
       tr
-        th= t('views.users.id')
-        th= t('views.users.email')
-        th= t('views.users.createdAt')
-    tbody
+        th.text-white= t('views.users.id')
+        th.text-white= t('views.users.email')
+        th.text-white= t('views.users.createdAt')
+    tbody.text-white
       each user in users
         tr
-          td= user.id
-          td= user.email
-          td= formatDate(user.createdAt)
+          td.text-white= user.id
+          td.text-white= user.email
+          td.text-white= formatDate(user.createdAt)

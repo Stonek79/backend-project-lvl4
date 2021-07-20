@@ -1,0 +1,64 @@
+doctype html
+html.h-100(lang='en')
+  head
+    meta(charset='utf-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1')
+    script(src=assetPath('main.js'))
+    link(href=assetPath('main.css') rel="stylesheet")
+    title Cover Template · Bootstrap v5.0
+    // link(rel='canonical' href='https://getbootstrap.com/docs/5.0/examples/cover/')
+    style.
+      .bd-placeholder-img {
+      font-size: 1.125rem;
+      text-anchor: middle;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      user-select: none;
+      }
+      @media (min-width: 768px) {
+      .bd-placeholder-img-lg {
+      font-size: 3.5rem;
+      }
+      }
+
+  body.d-flex.h-100.text-center.text-white.bg-dark
+    .cover-container.d-flex.w-100.h-100.p-3.mx-auto.flex-column
+      header.mb-auto
+        div
+          h3.float-md-start.mb-0
+            a.nav-link(href=route('root'))= t('mainpage.main')
+          nav.nav.nav-masthead.justify-content-center.float-md-end
+            a.nav-link.active(href=route('users'))= t('layouts.application.users')
+            if isAuthenticated()
+              li.nav-item
+                +buttonTo(route('session'), 'delete')(class="btn nav-link" value=t('layouts.application.signOut'))
+            else
+              li.nav-item
+                a.nav-link(href=route('newSession'))= t('layouts.application.signIn')
+              li.nav-item
+                a.nav-link(href=route('newUser'))= t('layouts.application.signUp')
+      
+      .container
+
+      each messages, type in reply.flash() || []
+        each message in messages
+          div.alert(class=`alert-${getAlertClass(type)}`)= message
+
+      h1.my-4
+        block header
+      block content
+      
+      main.px-3
+        h1=t('mainpage.title')
+        p.lead=t('mainpage.description')
+        p.lead
+          a.btn.btn-lg.btn-secondary.fw-bold.border-white.bg-white.text-primary(href='https://getbootstrap.com/docs/5.0/examples/cover/', target="_blank")= t('mainpage.goto')
+
+      footer.mt-auto.text-white-50
+        p
+          | Cover template for 
+          a.text-white(href='https://getbootstrap.com/') Bootstrap
+          | , by 
+          a.text-white(href='https://twitter.com/mdo') @mdo
+          | .
+
