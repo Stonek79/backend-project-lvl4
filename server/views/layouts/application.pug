@@ -8,7 +8,7 @@ html(lang="en")
     link(href=assetPath('main.css') rel="stylesheet")
     meta(name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no")
   body.d-flex.flex-column.min-vh-100.text-white.bg-dark
-    nav.navbar.navbar-expand-lg.mb-3
+    nav.navbar.navbar-expand-lg.mb-3.bg-white
       .container-fluid
         a.navbar-brand(href=route('root'))= t('appName')
         button.navbar-toggler(data-bs-toggle="collapse" data-bs-target="#navbarToggleExternalContent")
@@ -26,7 +26,7 @@ html(lang="en")
                 a.nav-link(href=route('newSession'))= t('layouts.application.signIn')
               li.nav-item
                 a.nav-link(href=route('newUser'))= t('layouts.application.signUp')
-    .container
+    .container.wrapper.flex-grow-1
 
       each messages, type in reply.flash() || []
         each message in messages

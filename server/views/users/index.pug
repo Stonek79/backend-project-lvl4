@@ -1,15 +1,21 @@
 extends ../layouts/application.pug
 
 block content
-  table.table.table-striped.text-white.bg-secondary
+  table.table.table-striped
     thead
       tr
         th.text-white= t('views.users.id')
         th.text-white= t('views.users.email')
+        th.text-white= t('views.users.fullName')
         th.text-white= t('views.users.createdAt')
+        th
     tbody.text-white
       each user in users
         tr
           td.text-white= user.id
           td.text-white= user.email
+          td.text-white #{user.firstName} #{user.lastName}
           td.text-white= formatDate(user.createdAt)
+          td
+            a(href=`/users/${user.id}/edit`)= t('views.users.edit.submit')
+            +buttonTo(`/users/${user.id}`, 'delete')(value=t('views.users.delete') class="btn btn-link")
