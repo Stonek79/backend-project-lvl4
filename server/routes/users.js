@@ -54,7 +54,7 @@ export default (app) => {
       }
     })
 
-    .patch('/users/:id', { name: 'editedUser' }, async (req, reply) => {
+    .patch('/users/:id', async (req, reply) => {
       const { id } = req.params;
       const userId = req.user.id;
       if (Number(id) !== Number(userId)) {

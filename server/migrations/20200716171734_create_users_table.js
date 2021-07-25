@@ -10,6 +10,15 @@ exports.up = (knex) => (
     table.timestamp('created_at').defaultTo(knex.fn.now());
     table.timestamp('updated_at').defaultTo(knex.fn.now());
   })
+  .createTable('statuses', (table) => {
+    table.increments('id').unsigned().primary();
+    table.string('name').notNullable();
+    table.timestamp('created_at').defaultTo(knex.fn.now());
+    table.timestamp('updated_at').defaultTo(knex.fn.now());
+  })
 );
 
-exports.down = (knex) => knex.schema.dropTable('users');
+exports.down = (knex) => knex
+  .schema
+  .dropTable('users')
+  .dropTable('statuses');

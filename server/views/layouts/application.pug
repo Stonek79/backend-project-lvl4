@@ -11,6 +11,10 @@ html(lang="en")
     nav.navbar.navbar-expand-lg.mb-3.bg-white
       .container-fluid
         a.navbar-brand(href=route('root'))= t('appName')
+        if isAuthenticated()
+          a.nav-link(href=route('statuses'))= t('layouts.application.statuses')
+          a.nav-link(href=route('labels'))= t('layouts.application.labels')
+          a.nav-link(href=route('tasks'))= t('layouts.application.tasks')
         button.navbar-toggler(data-bs-toggle="collapse" data-bs-target="#navbarToggleExternalContent")
           span.navbar-toggler-icon
         .collapse.navbar-collapse(id="navbarToggleExternalContent")
