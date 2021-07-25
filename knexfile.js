@@ -1,8 +1,9 @@
 // @ts-check
 
-require('dotenv').config();
-
+const dotenv = require('dotenv');
 const path = require('path');
+
+dotenv.config();
 
 const migrations = {
   directory: path.join(__dirname, 'server', 'migrations'),
@@ -26,7 +27,14 @@ module.exports = {
   },
   production: {
     client: 'pg',
-    connection: process.env.DATABASE_URL,
+    connection: {
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+      port: process.env.DB_PORT,
+      host: process.env.DB_HOST,
+      ssl: { rejectUnauthorized: false },
+    },
     useNullAsDefault: true,
     migrations,
   },
