@@ -9,6 +9,14 @@ const migrations = {
   directory: path.join(__dirname, 'server', 'migrations'),
 };
 
+const connection = {
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT,
+  host: process.env.DB_HOST,
+};
+
 module.exports = {
   development: {
     client: 'sqlite3',
@@ -27,14 +35,7 @@ module.exports = {
   },
   production: {
     client: 'pg',
-    connection: {
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      port: process.env.DB_PORT,
-      host: process.env.DB_HOST,
-    },
-    ssl: { rejectUnauthorized: false },
+    connection: process.env.DATABASE_URL || connection,
     useNullAsDefault: true,
     migrations,
   },
