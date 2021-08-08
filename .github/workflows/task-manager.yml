@@ -1,4 +1,4 @@
-name: Task Manager
+name: TaskManager
 
 on:
   push:
