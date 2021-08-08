@@ -1,7 +1,7 @@
 // @ts-check
 
 import getApp from '../server/index.js';
-import fakeUser from './helpers/index.js';
+import { fakeUser } from './helpers/index.js';
 
 describe('test session', () => {
   let app;

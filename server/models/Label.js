@@ -1,12 +1,9 @@
 import { Model } from 'objection';
 import path from 'path';
-import objectionUnique from 'objection-unique';
 
-const unique = objectionUnique({ fields: ['name'] });
-
-export default class Status extends unique(Model) {
+export default class Label extends Model {
   static get tableName() {
-    return 'statuses';
+    return 'labels';
   }
 
   static get jsonSchema() {
@@ -24,11 +21,15 @@ export default class Status extends unique(Model) {
 
   static relationMappings = {
     tasks: {
-      relation: Model.HasManyRelation,
+      relation: Model.ManyToManyRelation,
       modelClass: path.join(__dirname, 'Task'),
       join: {
-        from: 'statuses.id',
-        to: 'tasks.statusId',
+        from: 'labels.id',
+        through: {
+          from: 'tasks_labels.labelId',
+          to: 'tasks_labels.taskId',
+        },
+        to: 'tasks.id',
       },
     },
   };

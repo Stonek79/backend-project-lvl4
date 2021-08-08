@@ -1,5 +1,3 @@
-// @ts-check
-
 import dotenv from 'dotenv';
 import path from 'path';
 import fastify from 'fastify';
@@ -10,21 +8,20 @@ import fastifyFormbody from 'fastify-formbody';
 import fastifySecureSession from 'fastify-secure-session';
 import fastifyPassport from 'fastify-passport';
 import fastifySensible from 'fastify-sensible';
-// import fastifyFlash from 'fastify-flash';
-import { plugin as fastifyReverseRoutes } from 'fastify-reverse-routes';
+import fastifyReverseRoutes from 'fastify-reverse-routes';
 import fastifyMethodOverride from 'fastify-method-override';
 import fastifyObjectionjs from 'fastify-objectionjs';
+import Rollbar from 'rollbar';
 import qs from 'qs';
 import Pug from 'pug';
 import i18next from 'i18next';
 import ru from './locales/ru.js';
-// @ts-ignore
 import webpackConfig from '../webpack.config.babel.js';
 
 import addRoutes from './routes/index.js';
 import getHelpers from './helpers/index.js';
 import knexConfig from '../knexfile.js';
-import models from './models/index.js';
+import models from './models';
 import FormStrategy from './lib/passportStrategies/FormStrategy.js';
 
 dotenv.config();
@@ -50,7 +47,7 @@ const setUpViews = (app) => {
   });
 
   app.decorateReply('render', function render(viewPath, locals) {
-    this.view(viewPath, { ...locals, reply: this });
+    return this.view(viewPath, { ...locals, reply: this });
   });
 };
 
@@ -65,15 +62,14 @@ const setUpStaticAssets = (app) => {
 };
 
 const setupLocalization = () => {
-  i18next
-    .init({
-      lng: 'ru',
-      fallbackLng: 'en',
-      debug: isDevelopment,
-      resources: {
-        ru,
-      },
-    });
+  i18next.init({
+    lng: 'ru',
+    fallbackLng: 'en',
+    debug: isDevelopment,
+    resources: {
+      ru,
+    },
+  });
 };
 
 const addHooks = (app) => {
@@ -84,10 +80,18 @@ const addHooks = (app) => {
   });
 };
 
+const rollbar = new Rollbar({
+  accessToken: process.env.ROLLBAR_KEY,
+  captureUncaught: true,
+  captureUnhandledRejections: true,
+  enabled: process.env.NODE_ENV === 'production',
+});
+rollbar.log('Rollbar started');
+
 const registerPlugins = (app) => {
   app.register(fastifySensible);
   app.register(fastifyErrorPage);
-  app.register(fastifyReverseRoutes);
+  app.register(fastifyReverseRoutes.plugin);
   app.register(fastifyFormbody, { parser: qs.parse });
   app.register(fastifySecureSession, {
     secret: process.env.SESSION_KEY,
@@ -123,17 +127,26 @@ const registerPlugins = (app) => {
 export default () => {
   const app = fastify({
     logger: {
-      prettyPrint: isDevelopment,
+      ...(isDevelopment && {
+        prettyPrint: {
+          colorize: true,
+        },
+      }),
     },
   });
 
-  registerPlugins(app);
+  app.setErrorHandler((err, req, reply) => {
+    rollbar.error(err, req);
+    reply.send({ ok: false });
+  });
 
+  registerPlugins(app);
   setupLocalization();
   setUpViews(app);
   setUpStaticAssets(app);
-  addRoutes(app);
   addHooks(app);
+
+  app.after(() => addRoutes(app));
 
   return app;
 };

@@ -1,0 +1,20 @@
+extends ../layouts/application.pug
+
+block content
+  a.nav-link(href=route('newLabel'))= t('layouts.application.labelsNew')
+  table.table.table-striped
+    thead
+      tr
+        th.text-white= t('views.labels.id')
+        th.text-white= t('views.labels.name')
+        th.text-white= t('views.labels.createdAt')
+        th
+    tbody.text-white
+      each label in labels
+        tr
+          td.text-white= label.id
+          td.text-white= label.name
+          td.text-white= formatDate(label.createdAt)
+          td
+            a(href=`/labels/${label.id}/edit`)= t('views.labels.edit.submit')
+            +buttonTo(`/labels/${label.id}`, 'delete')(value=t('views.labels.delete') class="btn btn-link")

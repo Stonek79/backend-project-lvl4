@@ -4,6 +4,6 @@ block header
 
 block content
   +formFor()(action=route('statuses') method='post')
-    +input(user, 'name', t('views.statuses.new.name'), errors)(type="text").mt-2.mb-2
+    +input(status, 'name', t('views.statuses.new.name'), errors)(type="text").mt-2.mb-2
     +submit()(value=t('views.statuses.new.submit')).mt-3
     

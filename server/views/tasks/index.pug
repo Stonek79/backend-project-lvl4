@@ -1,0 +1,62 @@
+extends ../layouts/application.pug
+
+block content
+  a.nav-link(href=route('newTask'))= t('layouts.tasks.create')
+  .card
+    .card-body.p-2.bg-dark
+      form(action='/tasks' method='get')
+        .row
+          .col
+            .mb-3
+              label(for='data_status')= t('views.tasks.status')
+              select#data_status.form-control.ml-2.mr-3(name='status')
+                option
+                each status in statuses
+                  option(value=status.id, selected=filter.status === status.id.toString() ? true : false)= status.name
+          .col
+            .mb-3
+              label(for='data_executor')= t('views.tasks.executor')
+              select#data_executor.form-control.ml-2.mr-3(name='executor')
+                option
+                each executor in executors
+                  option(value=executor.id, selected=filter.executor === executor.id.toString() ? true : false) #{executor.firstName} #{executor.lastName}
+          .col
+            .mb-3
+              label(for='data_label')= t('views.tasks.label')
+              select#data_label.form-control.ml-2.mr-3(name='label')
+                option
+                each label in labels
+                  option(value=label.id, selected=filter.label === label.id.toString() ? true : false)= label.name
+                
+        .mb-3.form-check
+          if filter.creator 
+            input#data_isCreatorUser.form-check-input(type='checkbox' name='isCreatorUser' checked)
+            label.form-check-label(for='data_isCreatorUser')= t('layouts.tasks.own')
+          else
+            input#data_isCreatorUser.form-check-input(type='checkbox' name='isCreatorUser')
+            label.form-check-label(for='data_isCreatorUser')= t('layouts.tasks.own')
+        input.btn.btn-primary.ml-3(type='submit' value= t('views.tasks.show'))
+
+  table.table.table-striped
+    thead
+      tr
+        th.text-white= t('views.tasks.id')
+        th.text-white= t('views.tasks.name')
+        th.text-white= t('views.tasks.status')
+        th.text-white= t('views.tasks.author')
+        th.text-white= t('views.tasks.executor')
+        th.text-white= t('views.tasks.createdAt')
+        th
+    tbody.text-white
+      each task in tasks
+        tr
+          td.text-white= task.id
+          td.text-white
+            a(href=`/tasks/${task.id}`)=  _.get(task, 'name', '')
+          td.text-white= _.get(task, ['status', 'name'], '')
+          td.text-white #{_.get(task, ['creator', 'firstName'], '')} #{_.get(task, ['creator', 'lastName'], '')}
+          td.text-white #{_.get(task, ['executor', 'firstName'], '')} #{_.get(task, ['executor', 'lastName'], '')}
+          td.text-white= formatDate(task.createdAt)
+          td
+            a(href=`/tasks/${task.id}/edit`)= t('views.tasks.edit.submit')
+            +buttonTo(`/tasks/${task.id}`, 'delete')(value=t('views.tasks.delete') class="btn btn-link")
