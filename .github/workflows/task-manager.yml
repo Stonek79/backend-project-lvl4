@@ -20,6 +20,18 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
+          heroku-session-key: ${{ secrets.SESSION_KEY }}
+          heroku-app-name: cryptic-task-manager
+          heroku-email: amit-yurist@mail.ru
+          branch: main
+        env:
+          NODE_ENV: production
+          DB_TYPE: pg
+          DB_PORT: 5432
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_NAME: ${{ secrets.DB_NAME }}
 
       - name: npm install
         run: |
