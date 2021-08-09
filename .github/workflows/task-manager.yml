@@ -26,6 +26,7 @@ jobs:
           branch: main
         env:
           NODE_ENV: production
+          HOST: 0.0.0.0
           DB_TYPE: pg
           DB_PORT: 5432
           DB_HOST: ${{ secrets.DB_HOST }}
