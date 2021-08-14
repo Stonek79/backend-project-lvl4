@@ -32,8 +32,8 @@ describe('test tasks CRUD', () => {
     task = await models.task.query().insert({
       ...testData,
       creatorId: user.id,
-      executorId: `${user.id}`,
-      statusId: `${status.id}`,
+      executorId: user.id,
+      statusId: status.id,
     });
   });
 
@@ -116,9 +116,9 @@ describe('test tasks CRUD', () => {
   it('delete other user task', async () => {
     const otherUserTask = await models.task.query().insert({
       ...fakeTask(),
-      executorId: '2',
+      executorId: 2,
       creatorId: 2,
-      statusId: `${status.id}`,
+      statusId: status.id,
     });
 
     const response = await app.inject({

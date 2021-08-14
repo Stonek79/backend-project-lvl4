@@ -90,7 +90,7 @@ describe('test statuses CRUD', () => {
   it('delete status linked with task', async () => {
     await models.task.query().insert({
       ...fakeTask(),
-      statusId: status.id.toString(),
+      statusId: status.id,
     });
 
     const response = await app.inject({
