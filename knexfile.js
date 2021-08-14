@@ -35,7 +35,7 @@ module.exports = {
       database: process.env.DB_NAME,
       port: process.env.DB_PORT,
       host: process.env.DB_HOST,
-      ssl: true,
+      ssl: { rejectUnauthorized: false },
     },
     useNullAsDefault: true,
     migrations,
