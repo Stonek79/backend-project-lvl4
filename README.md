@@ -8,4 +8,4 @@
 ***
 
 
-### [Task manager](https://cryptic-scrubland-15443.herokuapp.com/)
+### [Task manager](https://cryptic-task-manager.herokuapp.com/)
