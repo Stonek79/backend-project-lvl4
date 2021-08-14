@@ -80,13 +80,20 @@ const addHooks = (app) => {
   });
 };
 
-const rollbar = new Rollbar({
-  accessToken: process.env.ROLLBAR_KEY,
-  captureUncaught: true,
-  captureUnhandledRejections: true,
-  enabled: process.env.NODE_ENV === 'production',
-});
-rollbar.log('Rollbar started');
+const rollbarHandler = (app) => {
+  const rollbar = new Rollbar({
+    accessToken: process.env.ROLLBAR_KEY,
+    captureUncaught: true,
+    captureUnhandledRejections: true,
+    enabled: process.env.NODE_ENV === 'production',
+  });
+  rollbar.log('Rollbar started');
+
+  app.setErrorHandler((err, req, reply) => {
+    rollbar.error(err, req);
+    reply.send({ ok: false });
+  });
+};
 
 const registerPlugins = (app) => {
   app.register(fastifySensible);
@@ -135,16 +142,12 @@ export default () => {
     },
   });
 
-  app.setErrorHandler((err, req, reply) => {
-    rollbar.error(err, req);
-    reply.send({ ok: false });
-  });
-
   registerPlugins(app);
   setupLocalization();
   setUpViews(app);
   setUpStaticAssets(app);
   addHooks(app);
+  rollbarHandler(app);
 
   app.after(() => addRoutes(app));
 
