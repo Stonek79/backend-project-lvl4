@@ -3,14 +3,6 @@
 import i18next from 'i18next';
 
 export default (app) => {
-  const isAllowed = async (req, res) => {
-    if (Number(req.params.id) !== Number(req.user.id)) {
-      req.flash('error', i18next.t('flash.statuses.update.notAllowed'));
-      return res.redirect(app.reverse('statuses'));
-    }
-    return null;
-  };
-
   app
     .get('/statuses', { name: 'statuses' }, async (_req, reply) => {
       const statuses = await app.objection.models.status.query();
@@ -25,7 +17,7 @@ export default (app) => {
       })
 
     .get('/statuses/:id/edit',
-      { name: 'editStatus', preValidation: app.authenticate, preHandler: isAllowed },
+      { name: 'editStatus', preValidation: app.authenticate },
       async (req, reply) => {
         const status = await app.objection.models.status.query().findById(req.params.id);
         return reply.render('statuses/edit', { status });

@@ -14,28 +14,29 @@ block content
       if errors && errors.statusId
         select#data_statusId.mt-2.mb-2.form-control(name='data[statusId]').is-invalid
           option
-          each status in statuses
-            if status.id === task.statusId
-              option(value=status.id selected='selected')= status.name
-            else
+          if statuses
+            each status in statuses
               option(value=status.id)= status.name
-        div.invalid-feedback= errors.statusId[0].message
-      else
+          else
+            option
+        div.invalid-feedback= 'should be >= 1'  
+      else  
         select#data_statusId.mt-2.mb-2.form-control(name='data[statusId]')
           option
-          each status in statuses
-            if status.id === task.statusId
-              option(value=status.id selected='selected')= status.name
-            else
-              option(value=status.id)= status.name
+          if statuses
+            each status in statuses
+              option(value=status.id, selected=task.statusId === status.id ? true : false)= status.name
+          else
+            option
     .mb-3
       label(for='data_executorId')= t('views.tasks.edit.executor')
       select#data_executorId.mt-2.mb-2.form-control(name='data[executorId]')
-        each executor in executors
-          if executor.id === task.executorId
-            option(value=executor.id selected='selected') #{executor.firstName} #{executor.lastName}
-          else
-            option(value=executor.id) #{executor.firstName} #{executor.lastName}
+        option
+        if executors
+          each executor in executors
+            option(value=executor.id, selected=task.executorId === executor.id ? true : false) #{executor.firstName} #{executor.lastName}
+        else
+          option
     .mb-3
       label(for='data_labels')= t('views.tasks.edit.labels')
       select#data_labels.mt-2.mb-2.form-control(name='data[labels]' multiple='multiple')

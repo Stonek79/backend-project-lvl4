@@ -2,13 +2,6 @@ import i18next from 'i18next';
 import _ from 'lodash';
 
 export default async (app) => {
-  const isAllowed = async (req, res) => {
-    if (Number(req.params.id) !== Number(req.user.id)) {
-      req.flash('error', i18next.t('flash.tasks.delete.notAllowed'));
-      return res.redirect(app.reverse('statuses'));
-    }
-    return null;
-  };
   app
     .get('/tasks', { name: 'tasks' }, async (req, reply) => {
       const { executor, label, status } = _.pickBy(req.query, (q) => q.length);
@@ -52,6 +45,7 @@ export default async (app) => {
         .withGraphFetched('[status, creator, executor, labels]')
         .findById(req.params.id);
 
+      console.log(task);
       return reply.render('tasks/info', { task });
     })
 
@@ -77,7 +71,10 @@ export default async (app) => {
       const { models } = await app.objection;
       const { labels = [], ...taskData } = req.body.data;
       const currentTask = {
-        ...taskData,
+        name: taskData.name,
+        description: taskData.description,
+        statusId: taskData.statusId ? Number(taskData.statusId) : '',
+        executorId: Number(taskData.executorId),
         creatorId: req.user.id,
       };
       const labelsIds = [labels].flat().map((label) => ({ id: Number(label) }));
@@ -112,7 +109,10 @@ export default async (app) => {
       const { models } = await app.objection;
       const { labels = [], ...taskData } = req.body.data;
       const currentTask = {
-        ...taskData,
+        name: taskData.name,
+        description: taskData.description,
+        statusId: taskData.statusId ? Number(taskData.statusId) : '',
+        executorId: Number(taskData.executorId),
         creatorId: req.user.id,
       };
       const labelsIds = [labels].flat().map((label) => ({ id: Number(label) }));
@@ -143,15 +143,15 @@ export default async (app) => {
       }
     })
 
-    .delete('/tasks/:id', { name: 'deleteTask', preHandler: isAllowed }, async (req, reply) => {
+    .delete('/tasks/:id', { name: 'deleteTask' }, async (req, reply) => {
       const { models } = app.objection;
       const task = await models.task
         .query()
         .withGraphFetched('[status, creator, executor]')
         .findById(req.params.id);
 
-      if (task.creatorId === req.params.id) {
-        req.flash('error', i18next.t('flash.tasks.delete.error'));
+      if (task.creatorId !== req.user.id) {
+        req.flash('error', i18next.t('flash.tasks.delete.notAllowed'));
       }
       await models.task.query().deleteById(req.params.id);
       req.flash('info', i18next.t('flash.tasks.delete.success'));

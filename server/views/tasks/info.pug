@@ -13,7 +13,7 @@ block content
           .col= (task.creator.firstName + ' ' + task.creator.lastName)
         .row.p-1
           .col= t('views.tasks.executor')
-          .col= (task.executor.firstName + ' ' + task.executor.lastName)
+          .col= task.executor && (task.executor.firstName + ' ' + task.executor.lastName)
         .row.p-1
           .col= t('views.tasks.status')
           .col= task.status.name

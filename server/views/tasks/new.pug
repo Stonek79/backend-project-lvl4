@@ -19,13 +19,13 @@ block content
               option(value=status.id)= status.name
           else
             option
-        div.invalid-feedback= errors.statusId[0].message
+        div.invalid-feedback= 'should be >= 1'  
       else  
         select#data_statusId.mt-2.mb-2.form-control(name='data[statusId]')
           option
           if statuses
             each status in statuses
-              option(value=status.id)= status.name
+              option(value=status.id, selected=task.statusId === status.id.toString() ? true : false)= status.name
           else
             option
     .mb-3
