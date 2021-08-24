@@ -30,9 +30,10 @@ export default async (app) => {
 
     .get('/tasks/new', { name: 'newTask' }, async (_req, reply) => {
       const task = await new app.objection.models.task();
-      const executors = await app.objection.models.user.query();
+      const tasksExecutors = await app.objection.models.user.query();
       const statuses = await app.objection.models.status.query();
       const labels = await app.objection.models.label.query();
+      const executors = tasksExecutors.map((e) => ({ ...e, name: `${e.firstName} ${e.lastName}` }));
 
       return reply.render('tasks/new', {
         task, executors, statuses, labels,
@@ -45,7 +46,6 @@ export default async (app) => {
         .withGraphFetched('[status, creator, executor, labels]')
         .findById(req.params.id);
 
-      console.log(task);
       return reply.render('tasks/info', { task });
     })
 
@@ -55,12 +55,13 @@ export default async (app) => {
       const { models } = await app.objection;
       const task = await models.task
         .query()
-        .withGraphFetched('[status, creator, executor]')
+        .withGraphFetched('[status, creator, executor, labels]')
         .findById(req.params.id);
 
       const statuses = await models.status.query();
-      const executors = await models.user.query();
+      const tasksExecutors = await models.user.query();
       const labels = await models.label.query();
+      const executors = tasksExecutors.map((e) => ({ ...e, name: `${e.firstName} ${e.lastName}` }));
 
       return reply.render('tasks/edit', {
         task, statuses, executors, labels,
@@ -73,10 +74,11 @@ export default async (app) => {
       const currentTask = {
         name: taskData.name,
         description: taskData.description,
-        statusId: taskData.statusId ? Number(taskData.statusId) : '',
+        statusId: Number(taskData.statusId),
         executorId: Number(taskData.executorId),
         creatorId: req.user.id,
       };
+
       const labelsIds = [labels].flat().map((label) => ({ id: Number(label) }));
 
       try {
@@ -93,12 +95,11 @@ export default async (app) => {
         return reply.redirect(app.reverse('tasks'));
       } catch ({ data }) {
         req.flash('error', i18next.t('flash.tasks.create.error'));
-        const tsks = req.body.data;
         const statuses = await models.status.query();
         const executors = await models.user.query();
         const lbels = await models.label.query();
         const currentTaskData = {
-          labels: lbels, executors, statuses, task: tsks,
+          labels: lbels, executors, statuses, task: req.body.data,
         };
 
         return reply.render('tasks/new', { ...currentTaskData, errors: data });
@@ -111,7 +112,7 @@ export default async (app) => {
       const currentTask = {
         name: taskData.name,
         description: taskData.description,
-        statusId: taskData.statusId ? Number(taskData.statusId) : '',
+        statusId: Number(taskData.statusId),
         executorId: Number(taskData.executorId),
         creatorId: req.user.id,
       };
@@ -131,15 +132,14 @@ export default async (app) => {
         return reply.redirect(app.reverse('tasks'));
       } catch ({ data }) {
         req.flash('error', i18next.t('flash.tasks.update.error'));
-        const tsks = req.body.data;
         const statuses = await models.status.query();
         const executors = await models.user.query();
         const lbels = await models.label.query();
         const currentTaskData = {
-          labels: lbels, executors, statuses, task: tsks,
+          labels: lbels, executors, statuses, task: req.body.data,
         };
 
-        return reply.render('tasks/new', { ...currentTaskData, errors: data });
+        return reply.render('tasks/edit', { ...currentTaskData, errors: data });
       }
     })
 

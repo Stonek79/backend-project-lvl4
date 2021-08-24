@@ -9,7 +9,7 @@ mixin input(entity, propertyName, label, errors = {})
   - propertyErrors = _.get(errors, propertyName)
   - classLine = 'form-control' + (_.isEmpty(errors) ? '' : ' is-invalid')
   - inputId = getInputId(propertyName)
-  .form-group(class=(errors[propertyName] && 'has-danger'))
+  .mb-3(class=(errors[propertyName] && 'has-danger'))
     label(
       for= inputId
     )= label
@@ -20,6 +20,43 @@ mixin input(entity, propertyName, label, errors = {})
       value=_.get(entity, propertyName, '')
     )&attributes(attributes)
     if !_.isEmpty(propertyErrors)
+      .invalid-feedback= propertyErrors.map(({ message }) => message).join('. ')
+
+mixin textarea(entity, propertyName, label)
+  - inputId = getInputId(propertyName)
+  .mb-3
+    label(for= inputId)= label
+    textarea(
+      id= inputId
+      name=getInputName(propertyName)
+      class='form-control'
+      value=_.get(entity, propertyName, '')
+      rows='3'
+    )&attributes(attributes)
+
+mixin select(entityes, task, propertyName, label, errors = {}, multiple = false)
+  - propertyErrors = _.get(errors, propertyName)
+  - classLine = 'form-control' + (_.isEmpty(errors[propertyName]) ? '' : ' is-invalid')
+  - inputId = getInputId(propertyName)
+  - selectedId = Array.isArray(task[propertyName]) ? task[propertyName].map((el) => el.id) : task[propertyName]
+  - currentSelectedId = _.isEmpty(task) ? 0 : selectedId
+  - isSelected = (entity) => [currentSelectedId].flat().includes(entity.id) ? true : false
+  .mb-3(class=(errors[propertyName] && 'has-danger'))
+    label(for= inputId)= label
+    select(
+      id= inputId
+      name=getInputName(propertyName)
+      class=classLine
+      multiple=multiple
+    )&attributes(attributes)
+      if !multiple 
+        option
+      each entity in entityes
+        option(
+          value=entity.id
+          selected= isSelected(entity)
+        )= entity.name
+    if !_.isEmpty(propertyErrors && inputId)
       .invalid-feedback= propertyErrors.map(({ message }) => message).join('. ')
 
 mixin submit(form = null)

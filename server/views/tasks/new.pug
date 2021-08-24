@@ -5,44 +5,9 @@ block header
 
 block content
   +formFor()(action=route('tasks') method='post')
-    +input(task, 'name', t('views.tasks.new.name'), errors)(type="text").mt-2.mb-2
-    .mb-3
-      label(for='data_description')= t('views.tasks.new.description')
-      textarea#data_description.mt-2.mb-2.form-control(name='data[description]' rows='3', value=task.description)
-    .mb-3
-      label(for='data_statusId')= t('views.tasks.new.status')
-      if errors && errors.statusId
-        select#data_statusId.mt-2.mb-2.form-control(name='data[statusId]').is-invalid
-          option
-          if statuses
-            each status in statuses
-              option(value=status.id)= status.name
-          else
-            option
-        div.invalid-feedback= 'should be >= 1'  
-      else  
-        select#data_statusId.mt-2.mb-2.form-control(name='data[statusId]')
-          option
-          if statuses
-            each status in statuses
-              option(value=status.id, selected=task.statusId === status.id.toString() ? true : false)= status.name
-          else
-            option
-    .mb-3
-      label(for='data_executorId')= t('views.tasks.new.executor')
-      select#data_executorId.mt-2.mb-2.form-control(name='data[executorId]')
-        option
-        if executors
-          each executor in executors
-            option(value=executor.id) #{executor.firstName} #{executor.lastName}
-        else
-          option
-    .mb-3
-      label(for='data_labels')= t('views.tasks.new.labels')
-      select#data_labels.mt-2.mb-2.form-control(name='data[labels]' multiple='multiple')
-        if labels
-          each label in labels
-            option(value=label.id)= label.name
-        else
-          option
+    +input(task, 'name', t('views.tasks.new.name'), errors)(type="text")
+    +textarea(task, 'description', t('views.tasks.edit.description'))
+    +select(statuses, task, 'statusId', t('views.tasks.new.status'), errors)
+    +select(executors, task, 'executorId', t('views.tasks.new.executor'), errors)
+    +select(labels, task, 'labels', t('views.tasks.new.labels'), errors, multiple=true)
     +submit()(value=t('views.tasks.new.submit')).mt-3
