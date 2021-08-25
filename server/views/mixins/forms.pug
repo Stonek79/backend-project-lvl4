@@ -26,7 +26,6 @@ mixin textarea(entity, propertyName, label)
   - inputId = getInputId(propertyName)
   .mb-3
     label(for= inputId)= label
-    -console.log(_.get(entity, propertyName, ''))
     textarea(
       id= inputId
       name=getInputName(propertyName)
