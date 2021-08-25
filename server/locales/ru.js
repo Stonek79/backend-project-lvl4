@@ -47,7 +47,7 @@ module.exports = {
       },
       labels: {
         create: {
-          error: 'Не удалось установить метку',
+          error: 'Не удалось создать метку',
           success: 'Метка успешно создана',
         },
         update: {
