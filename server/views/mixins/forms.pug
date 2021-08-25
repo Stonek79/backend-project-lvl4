@@ -26,13 +26,14 @@ mixin textarea(entity, propertyName, label)
   - inputId = getInputId(propertyName)
   .mb-3
     label(for= inputId)= label
+    -console.log(_.get(entity, propertyName, ''))
     textarea(
       id= inputId
       name=getInputName(propertyName)
       class='form-control'
-      value=_.get(entity, propertyName, '')
+      
       rows='3'
-    )&attributes(attributes)
+    )&attributes(attributes)= _.get(entity, propertyName, '')
 
 mixin select(entityes, task, propertyName, label, errors = {}, multiple = false)
   - propertyErrors = _.get(errors, propertyName)
