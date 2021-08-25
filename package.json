@@ -15,7 +15,7 @@
       "start": "NODE_ENV=production node dist/server/bin/server.js"
    },
    "engines": {
-      "node": "13.x"
+      "node": "14.x"
    },
    "jest": {
       "modulePathIgnorePatterns": [
@@ -61,7 +61,7 @@
       "pug": "^3.0.2",
       "qs": "^6.10.1",
       "rollbar": "^2.24.0",
-      "sqlite3": "^4.2.0",
+      "sqlite3": "^5.0.2",
       "webpack": "^5.38.1"
    },
    "devDependencies": {
