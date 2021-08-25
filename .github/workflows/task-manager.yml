@@ -20,10 +20,10 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - name: npm install, build
+      - name: npm install, build-prod
         run: |
           make setup
-          make build
+          make build-prod
 
       - name: Run linter
         run: make lint

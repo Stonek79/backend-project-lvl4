@@ -9,6 +9,9 @@ db-migrate:
 build:
 	npm run build
 
+build-prod:
+	npm run build-prod
+
 prepare:
 	cp -n .env.example .env || true
 
