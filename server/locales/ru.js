@@ -112,6 +112,7 @@ module.exports = {
         id: 'ID',
         name: 'Наименование',
         createdAt: 'Дата создания',
+        action: 'Действия',
         delete: 'Удалить',
         new: {
           create: 'Создание статуса',
@@ -128,6 +129,7 @@ module.exports = {
         id: 'ID',
         name: 'Наименование',
         createdAt: 'Дата создания',
+        action: 'Действия',
         delete: 'Удалить',
         new: {
           create: 'Создание метки',
@@ -149,6 +151,7 @@ module.exports = {
         labels: 'Метки:',
         executor: 'Исполнитель',
         createdAt: 'Дата создания',
+        action: 'Действия',
         delete: 'Удалить',
         show: 'Показать',
         new: {
@@ -175,6 +178,7 @@ module.exports = {
         email: 'Email',
         fullName: 'Полное имя',
         createdAt: 'Дата создания',
+        action: 'Действия',
         delete: 'Удалить',
         new: {
           signUp: 'Регистрация',
