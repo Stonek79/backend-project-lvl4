@@ -79,24 +79,19 @@ export default async (app) => {
     .post('/tasks', async (req, reply) => {
       const { models } = await app.objection;
       const { labels = [], ...taskData } = req.body.data;
+      const labelsIds = [labels].flat().map((label) => ({ id: Number(label) }));
       const currentTask = {
         name: taskData.name,
         description: taskData.description,
         statusId: Number(taskData.statusId),
         executorId: Number(taskData.executorId),
         creatorId: req.user.id,
+        labels: labelsIds,
       };
-
-      const labelsIds = [labels].flat().map((label) => ({ id: Number(label) }));
 
       console.log(currentTask, 'currentTask');
       try {
-        await models.task.transaction((trx) => (
-          models.task.query(trx).upsertGraph(
-            { ...currentTask, labels: labelsIds },
-            { relate: true, unrelate: true, noUpdate: ['labels'] },
-          )
-        ));
+        await models.task.transaction((trx) => models.task.query(trx).insertGraph(currentTask));
 
         req.flash('info', i18next.t('flash.tasks.create.success'));
         return reply.redirect(app.reverse('tasks'));
@@ -119,22 +114,22 @@ export default async (app) => {
     .patch('/tasks/:id', { name: 'updateTask' }, async (req, reply) => {
       const { models } = await app.objection;
       const { labels = [], ...taskData } = req.body.data;
+      const labelsIds = [labels].flat().map((label) => ({ id: Number(label) }));
+
       const currentTask = {
+        id: Number(req.params.id),
         name: taskData.name,
         description: taskData.description,
         statusId: Number(taskData.statusId),
         executorId: Number(taskData.executorId),
         creatorId: req.user.id,
+        labels: labelsIds,
       };
-
-      const labelsIds = [labels].flat().map((label) => ({ id: Number(label) }));
 
       try {
         await models.task.transaction((trx) => (
-          models.task.query(trx).upsertGraph(
-            { id: Number(req.params.id), ...currentTask, labels: labelsIds },
-            { relate: true, unrelate: true, noUpdate: ['labels'] },
-          )
+          models.task.query(trx).upsertGraph(currentTask,
+            { relate: true, unrelate: true, noUpdate: ['labels'] })
         ));
 
         req.flash('info', i18next.t('flash.tasks.update.success'));
