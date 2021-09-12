@@ -70,7 +70,6 @@ export default async (app) => {
 
       const executors = tasksExecutors.map((e) => ({ ...e, name: `${e.firstName} ${e.lastName}` }));
 
-      console.log(task, statuses, executors, labels, 'getEditTask');
       return reply.render('tasks/edit', {
         task, statuses, executors, labels,
       });
@@ -89,14 +88,12 @@ export default async (app) => {
         labels: labelsIds,
       };
 
-      console.log(currentTask, 'currentTask');
       try {
         await models.task.transaction((trx) => models.task.query(trx).insertGraph(currentTask));
 
         req.flash('info', i18next.t('flash.tasks.create.success'));
         return reply.redirect(app.reverse('tasks'));
       } catch ({ data }) {
-        console.log(data, 'taskAddError');
         req.flash('error', i18next.t('flash.tasks.create.error'));
         const [statuses, executors, lbels] = await Promise.all([
           models.status.query(),
