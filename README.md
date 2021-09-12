@@ -23,7 +23,7 @@ and then install the following application to your machine using **make setup** 
 
 ```
 
-For lunch application use **make start** in terminal
+For launch application use **make start** in terminal
 
 ```
   make start
