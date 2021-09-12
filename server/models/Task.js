@@ -1,7 +1,6 @@
-import { Model } from 'objection';
-import path from 'path';
+import BaseModel from './BaseModel';
 
-export default class Task extends Model {
+export default class Task extends BaseModel {
   static get tableName() {
     return 'tasks';
   }
@@ -16,7 +15,7 @@ export default class Task extends Model {
         description: { type: 'string' },
         statusId: { type: 'integer', minimum: 1 },
         creatorId: { type: 'integer' },
-        executorId: { type: 'integer' },
+        executorId: { type: ['integer', null] },
         createdAt: { type: 'string' },
         updatedAt: { type: 'string' },
       },
@@ -26,8 +25,8 @@ export default class Task extends Model {
   static get relationMappings() {
     return {
       status: {
-        relation: Model.BelongsToOneRelation,
-        modelClass: path.join(__dirname, 'Status'),
+        relation: BaseModel.BelongsToOneRelation,
+        modelClass: 'Status',
         join: {
           from: 'tasks.statusId',
           to: 'statuses.id',
@@ -35,8 +34,8 @@ export default class Task extends Model {
       },
 
       creator: {
-        relation: Model.BelongsToOneRelation,
-        modelClass: path.join(__dirname, 'User'),
+        relation: BaseModel.BelongsToOneRelation,
+        modelClass: 'User',
         join: {
           from: 'tasks.creatorId',
           to: 'users.id',
@@ -44,16 +43,16 @@ export default class Task extends Model {
       },
 
       executor: {
-        relation: Model.BelongsToOneRelation,
-        modelClass: path.join(__dirname, 'User'),
+        relation: BaseModel.BelongsToOneRelation,
+        modelClass: 'User',
         join: {
           from: 'tasks.executorId',
           to: 'users.id',
         },
       },
       labels: {
-        relation: Model.ManyToManyRelation,
-        modelClass: path.join(__dirname, 'Label'),
+        relation: BaseModel.ManyToManyRelation,
+        modelClass: 'Label',
         join: {
           from: 'tasks.id',
           through: {

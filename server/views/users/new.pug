@@ -5,8 +5,8 @@ block header
 
 block content
   +formFor()(action=route('users') method='post')
-    +input(user, 'firstName', t('views.users.new.firstname'), errors)(type="text").mt-2.mb-2
-    +input(user, 'lastName', t('views.users.new.lastname'), errors)(type="text").mt-2.mb-2
-    +input(user, 'email', t('views.users.new.email'), errors)(type="email").mt-2.mb-2
-    +input(user, 'password', t('views.users.new.password'), errors)(type="password").mt-2.mb-2
-    +submit()(value=t('views.users.new.submit')).mt-3
+    +input(user, 'firstName', t('views.users.new.firstname'), errors)(type="text", autofocus)
+    +input(user, 'lastName', t('views.users.new.lastname'), errors)(type="text")
+    +input(user, 'email', t('views.users.new.email'), errors)(type="email")
+    +input(user, 'password', t('views.users.new.password'), errors)(type="password")
+    +submit()(value=t('views.users.new.submit'))

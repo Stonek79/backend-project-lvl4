@@ -3,7 +3,7 @@
 import _ from 'lodash';
 import getApp from '../server/index.js';
 import encrypt from '../server/lib/secure.js';
-import { fakeUser, fakeTask } from './helpers/index.js';
+import { getTestData, prepareData, signIn } from './helpers/index.js';
 
 describe('test users CRUD', () => {
   let app;
@@ -11,17 +11,20 @@ describe('test users CRUD', () => {
   let models;
   let user;
   let testData;
+  let cookies;
 
   beforeAll(async () => {
     app = await getApp();
     knex = app.objection.knex;
     models = app.objection.models;
-    testData = fakeUser();
+    testData = getTestData();
   });
 
   beforeEach(async () => {
     await knex.migrate.latest();
-    user = await models.user.query().insert(testData);
+    await prepareData(app);
+    user = await models.user.query().insert(testData.users.existing);
+    cookies = await signIn(app, testData.users.existing);
   });
 
   it('index', async () => {
@@ -43,13 +46,14 @@ describe('test users CRUD', () => {
   });
 
   it('create user', async () => {
-    const newUser = fakeUser();
+    const newUser = testData.users.new;
     const response = await app.inject({
       method: 'POST',
       url: app.reverse('users'),
       payload: {
         data: newUser,
       },
+      cookies,
     });
 
     expect(response.statusCode).toBe(302);
@@ -64,13 +68,14 @@ describe('test users CRUD', () => {
   });
 
   it('edit user', async () => {
-    const newUser = fakeUser();
+    const newUser = testData.users.new;
     const response = await app.inject({
       method: 'PATCH',
       url: `/users/${user.id}`,
       payload: {
         data: newUser,
       },
+      cookies,
     });
 
     expect(response.statusCode).toBe(302);
@@ -85,9 +90,10 @@ describe('test users CRUD', () => {
     expect(editedUser).toMatchObject(expected);
   });
 
-  test('delete user', async () => {
+  it('delete user', async () => {
     const response = await app.inject({
       method: 'DELETE',
+      cookies,
       url: app.reverse('deleteUser', { id: user.id }),
     });
 
@@ -95,7 +101,7 @@ describe('test users CRUD', () => {
   });
 
   it('create user with empty field', async () => {
-    const newUser = fakeUser();
+    const newUser = testData.users.new;
 
     const response = await app.inject({
       method: 'POST',
@@ -103,6 +109,7 @@ describe('test users CRUD', () => {
       payload: {
         data: { ...newUser, firstName: '', lastName: '' },
       },
+      cookies,
     });
 
     expect(response.statusCode).toBe(200);
@@ -112,7 +119,7 @@ describe('test users CRUD', () => {
   });
 
   it('create user with the same email', async () => {
-    const newUser = fakeUser();
+    const newUser = testData.users.new;
 
     const response = await app.inject({
       method: 'POST',
@@ -120,6 +127,7 @@ describe('test users CRUD', () => {
       payload: {
         data: { ...newUser, email: user.email },
       },
+      cookies,
     });
 
     expect(response.statusCode).toBe(200);
@@ -128,8 +136,8 @@ describe('test users CRUD', () => {
     expect(falseCreatedUser).toBeUndefined();
   });
 
-  it('update user with no password', async () => {
-    const newUser = fakeUser();
+  it('update user with empty password', async () => {
+    const newUser = testData.users.new;
 
     const { statusCode } = await app.inject({
       method: 'PATCH',
@@ -137,6 +145,7 @@ describe('test users CRUD', () => {
       payload: {
         data: { ...newUser, password: '' },
       },
+      cookies,
     });
 
     expect(statusCode).toBe(200);
@@ -147,13 +156,14 @@ describe('test users CRUD', () => {
 
   it('delete user with tasks', async () => {
     await models.task.query().insert({
-      ...fakeTask(),
+      ...testData.tasks.new,
       creatorId: user.id,
     });
 
     const response = await app.inject({
       method: 'DELETE',
       url: app.reverse('deleteUser', { id: user.id }),
+      cookies,
     });
 
     expect(response.statusCode).toBe(302);

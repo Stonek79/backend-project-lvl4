@@ -9,7 +9,7 @@ mixin input(entity, propertyName, label, errors = {})
   - propertyErrors = _.get(errors, propertyName)
   - classLine = 'form-control' + (_.isEmpty(errors) ? '' : ' is-invalid')
   - inputId = getInputId(propertyName)
-  .mb-3(class=(errors[propertyName] && 'has-danger'))
+  .mb-3.mt-2(class=(errors[propertyName] && 'has-danger'))
     label(
       for= inputId
     )= label
@@ -18,13 +18,13 @@ mixin input(entity, propertyName, label, errors = {})
       name=getInputName(propertyName)
       class=classLine
       value=_.get(entity, propertyName, '')
-    )&attributes(attributes)
+    )&attributes(attributes).mb-3.mt-2
     if !_.isEmpty(propertyErrors)
       .invalid-feedback= propertyErrors.map(({ message }) => message).join('. ')
 
 mixin textarea(entity, propertyName, label)
   - inputId = getInputId(propertyName)
-  .mb-3
+  .mb-3.mt-2
     label(for= inputId)= label
     textarea(
       id= inputId
@@ -32,7 +32,7 @@ mixin textarea(entity, propertyName, label)
       class='form-control'
       
       rows='3'
-    )&attributes(attributes)= _.get(entity, propertyName, '')
+    )&attributes(attributes).mb-3.mt-2= _.get(entity, propertyName, '')
 
 mixin select(entityes, task, propertyName, label, errors = {}, multiple = false)
   - propertyErrors = _.get(errors, propertyName)
@@ -41,14 +41,14 @@ mixin select(entityes, task, propertyName, label, errors = {}, multiple = false)
   - selectedId = Array.isArray(task[propertyName]) ? task[propertyName].map((el) => el.id) : task[propertyName]
   - currentSelectedId = _.isEmpty(task) ? 0 : selectedId
   - isSelected = (entity) => [currentSelectedId].flat().includes(entity.id) ? true : false
-  .mb-3(class=(errors[propertyName] && 'has-danger'))
+  .mb-3.mt-2(class=(errors[propertyName] && 'has-danger'))
     label(for= inputId)= label
     select(
       id= inputId
       name=getInputName(propertyName)
       class=classLine
       multiple=multiple
-    )&attributes(attributes)
+    )&attributes(attributes).mb-3.mt-2
       if !multiple 
         option
       each entity in entityes
@@ -60,7 +60,7 @@ mixin select(entityes, task, propertyName, label, errors = {}, multiple = false)
       .invalid-feedback= propertyErrors.map(({ message }) => message).join('. ')
 
 mixin submit(form = null)
-  input(class='btn btn-primary' type='submit')&attributes(attributes)
+  input(class='btn btn-primary' type='submit')&attributes(attributes).mt-2
 
 mixin buttonTo(action, method)
   form(action=action, method="post")

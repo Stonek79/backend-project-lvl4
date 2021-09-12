@@ -7,5 +7,31 @@
 [![WF](https://github.com/Stonek79/backend-project-lvl4/workflows/TaskManager/badge.svg)](https://github.com/Stonek79/backend-project-lvl4)
 ***
 
+### Installation and launch
+
+To install application *clone* application to your project directory
+
+```
+  clone https://github.com/Stonek79/backend-project-lvl4.git
+
+```
+
+and then install the following application to your machine using **make setup** command in terminal
+
+```
+  make setup
+
+```
+
+For lunch application use **make start** in terminal
+
+```
+  make start
+
+```
+
+Application will start at *localhost 5000*
+
+**Example:**
 
 ### [Task manager](https://cryptic-task-manager.herokuapp.com/)

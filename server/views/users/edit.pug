@@ -5,9 +5,9 @@ block header
 
 block content
   +formFor()(action=`/users/${user.id}` method="post")
-    +input(user, 'firstName', t('views.users.edit.firstname'), errors)(type="text").mt-2.mb-2
-    +input(user, 'lastName', t('views.users.edit.lastname'), errors)(type="text").mt-2.mb-2
-    +input(user, 'email', t('views.users.edit.email'), errors)(type="email").mt-2.mb-2
-    +input({}, 'password', t('views.users.edit.password'), errors)(type="password").mt-2.mb-2
+    +input(user, 'firstName', t('views.users.edit.firstname'), errors)(type="text", autofocus)
+    +input(user, 'lastName', t('views.users.edit.lastname'), errors)(type="text")
+    +input(user, 'email', t('views.users.edit.email'), errors)(type="email")
+    +input({}, 'password', t('views.users.edit.password'), errors)(type="password")
     input(name="_method" type="hidden" value="patch")
-    +submit()(value=t('views.users.edit.submit')).mt-3
+    +submit()(value=t('views.users.edit.submit'))

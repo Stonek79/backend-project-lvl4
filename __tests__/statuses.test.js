@@ -1,5 +1,5 @@
 import getApp from '../server/index.js';
-import { fakeTask, fakeStatus } from './helpers/index.js';
+import { getTestData } from './helpers/index.js';
 
 describe('test statuses CRUD', () => {
   let app;
@@ -12,12 +12,12 @@ describe('test statuses CRUD', () => {
     app = await getApp();
     models = app.objection.models;
     knex = app.objection.knex;
-    testData = fakeStatus();
+    testData = getTestData();
   });
 
   beforeEach(async () => {
     await knex.migrate.latest();
-    status = await models.status.query().insert(testData);
+    status = await models.status.query().insert(testData.statuses.existing);
   });
 
   it('index', async () => {
@@ -39,7 +39,7 @@ describe('test statuses CRUD', () => {
   });
 
   it('create status', async () => {
-    const newStatus = fakeStatus();
+    const newStatus = testData.statuses.new;
 
     const response = await app.inject({
       method: 'POST',
@@ -57,7 +57,7 @@ describe('test statuses CRUD', () => {
   });
 
   it('edit status', async () => {
-    const newStatus = fakeStatus();
+    const newStatus = testData.statuses.new;
 
     const response = await app.inject({
       method: 'PATCH',
@@ -89,7 +89,7 @@ describe('test statuses CRUD', () => {
 
   it('delete status linked with task', async () => {
     await models.task.query().insert({
-      ...fakeTask(),
+      ...testData.tasks.existing,
       statusId: status.id,
     });
 

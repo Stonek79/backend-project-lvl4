@@ -1,7 +1,9 @@
-import { Model } from 'objection';
-import path from 'path';
+import objectionUnique from 'objection-unique';
+import BaseModel from './BaseModel';
 
-export default class Label extends Model {
+const unique = objectionUnique({ fields: ['name'] });
+
+export default class Label extends unique(BaseModel) {
   static get tableName() {
     return 'labels';
   }
@@ -21,8 +23,8 @@ export default class Label extends Model {
 
   static relationMappings = {
     tasks: {
-      relation: Model.ManyToManyRelation,
-      modelClass: path.join(__dirname, 'Task'),
+      relation: BaseModel.ManyToManyRelation,
+      modelClass: 'Task',
       join: {
         from: 'labels.id',
         through: {

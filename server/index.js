@@ -80,7 +80,7 @@ const addHooks = (app) => {
   });
 };
 
-const rollbarHandler = (app) => {
+const setupRollbar = (app) => {
   const rollbar = new Rollbar({
     accessToken: process.env.ROLLBAR_KEY,
     captureUncaught: true,
@@ -147,7 +147,7 @@ export default () => {
   setUpViews(app);
   setUpStaticAssets(app);
   addHooks(app);
-  rollbarHandler(app);
+  setupRollbar(app);
 
   app.after(() => addRoutes(app));
 

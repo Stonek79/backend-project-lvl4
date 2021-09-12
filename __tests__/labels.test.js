@@ -1,5 +1,5 @@
 import getApp from '../server/index.js';
-import { fakeTask, fakeLabel } from './helpers/index.js';
+import { getTestData } from './helpers/index.js';
 
 describe('test labels CRUD', () => {
   let app;
@@ -12,12 +12,12 @@ describe('test labels CRUD', () => {
     app = await getApp();
     models = app.objection.models;
     knex = app.objection.knex;
-    testData = fakeLabel();
+    testData = getTestData();
   });
 
   beforeEach(async () => {
     await knex.migrate.latest();
-    label = await models.label.query().insert(testData);
+    label = await models.label.query().insert(testData.labels.existing);
   });
 
   it('index', async () => {
@@ -39,7 +39,7 @@ describe('test labels CRUD', () => {
   });
 
   it('create label', async () => {
-    const newLabel = fakeLabel();
+    const newLabel = testData.labels.new;
 
     const response = await app.inject({
       method: 'POST',
@@ -57,7 +57,7 @@ describe('test labels CRUD', () => {
   });
 
   it('edit label', async () => {
-    const newLabel = fakeLabel();
+    const newLabel = testData.labels.new;
 
     const response = await app.inject({
       method: 'PATCH',
@@ -88,7 +88,7 @@ describe('test labels CRUD', () => {
   });
 
   it('delete label linked with task', async () => {
-    const task = await models.task.query().insert(fakeTask());
+    const task = await models.task.query().insert(testData.tasks.existing);
     await task.$relatedQuery('labels').relate(label);
 
     const response = await app.inject({

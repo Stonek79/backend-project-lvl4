@@ -1,10 +1,9 @@
-import { Model } from 'objection';
-import path from 'path';
 import objectionUnique from 'objection-unique';
+import BaseModel from './BaseModel';
 
 const unique = objectionUnique({ fields: ['name'] });
 
-export default class Status extends unique(Model) {
+export default class Status extends unique(BaseModel) {
   static get tableName() {
     return 'statuses';
   }
@@ -24,8 +23,8 @@ export default class Status extends unique(Model) {
 
   static relationMappings = {
     tasks: {
-      relation: Model.HasManyRelation,
-      modelClass: path.join(__dirname, 'Task'),
+      relation: BaseModel.HasManyRelation,
+      modelClass: 'Task',
       join: {
         from: 'statuses.id',
         to: 'tasks.statusId',

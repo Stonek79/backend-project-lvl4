@@ -5,9 +5,9 @@ block header
 
 block content
   +formFor()(action=route('tasks') method='post')
-    +input(task, 'name', t('views.tasks.new.name'), errors)(type="text")
+    +input(task, 'name', t('views.tasks.new.name'), errors)(type="text", autofocus)
     +textarea(task, 'description', t('views.tasks.edit.description'))
     +select(statuses, task, 'statusId', t('views.tasks.new.status'), errors)
     +select(executors, task, 'executorId', t('views.tasks.new.executor'), errors)
     +select(labels, task, 'labels', t('views.tasks.new.labels'), errors, multiple=true)
-    +submit()(value=t('views.tasks.new.submit')).mt-3
+    +submit()(value=t('views.tasks.new.submit'))

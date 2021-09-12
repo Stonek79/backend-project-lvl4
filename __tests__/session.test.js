@@ -1,24 +1,19 @@
 // @ts-check
 
 import getApp from '../server/index.js';
-import { fakeUser } from './helpers/index.js';
+import { getTestData, prepareData } from './helpers/index.js';
 
 describe('test session', () => {
   let app;
   let knex;
-  let models;
-
-  const newUser = fakeUser();
+  let testData;
 
   beforeAll(async () => {
     app = await getApp();
     knex = app.objection.knex;
-    models = app.objection.models;
-  });
-
-  beforeEach(async () => {
     await knex.migrate.latest();
-    await models.user.query().insert(newUser);
+    await prepareData(app);
+    testData = getTestData();
   });
 
   it('test sign in / sign out', async () => {
@@ -29,16 +24,15 @@ describe('test session', () => {
 
     expect(response.statusCode).toBe(200);
 
-    const { email, password } = newUser;
     const responseSignIn = await app.inject({
       method: 'POST',
       url: app.reverse('session'),
       payload: {
-        data: { email, password },
+        data: testData.users.existing,
       },
     });
 
-    expect(responseSignIn.statusCode).toBe(302);
+    expect(responseSignIn.statusCode).toBe(200);
     // после успешной аутентификации получаем куки из ответа,
     // они понадобятся для выполнения запросов на маршруты требующие
     // предварительную аутентификацию

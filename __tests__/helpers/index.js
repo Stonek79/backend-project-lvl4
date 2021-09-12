@@ -1,30 +1,33 @@
 // @ts-check
 
-import faker from 'faker';
+import fs from 'fs';
+import path from 'path';
 
-const fakeUser = () => ({
-  firstName: faker.name.firstName(),
-  lastName: faker.name.lastName(),
-  email: faker.internet.email(),
-  password: faker.internet.password(),
-});
+const getFixturePath = (filename) => path.join(__dirname, '..', '..', '__fixtures__', filename);
+const readFixture = (filename) => fs.readFileSync(getFixturePath(filename), 'utf-8').trim();
+const getFixtureData = (filename) => JSON.parse(readFixture(filename));
 
-const fakeTask = () => ({
-  name: faker.lorem.word(),
-  description: faker.lorem.paragraph(),
-  statusId: 1,
-  executorId: 1,
-  creatorId: 1,
-});
+const getTestData = () => getFixtureData('testData.json');
 
-const fakeStatus = () => ({
-  name: faker.lorem.word(),
-});
+const prepareData = async (app) => {
+  const { knex } = app.objection;
 
-const fakeLabel = () => ({
-  name: faker.lorem.word(),
-});
-
-export {
-  fakeUser, fakeTask, fakeStatus, fakeLabel,
+  await knex('users').insert(getFixtureData('users.json'));
+  await knex('tasks').insert(getFixtureData('tasks.json'));
 };
+
+const signIn = async (app, testData) => {
+  const responseSignIn = await app.inject({
+    method: 'POST',
+    url: app.reverse('session'),
+    payload: {
+      data: testData,
+    },
+  });
+
+  const [sessionCookie] = responseSignIn.cookies;
+  const { name, value } = sessionCookie;
+  return { [name]: value };
+};
+
+export { getTestData, prepareData, signIn };

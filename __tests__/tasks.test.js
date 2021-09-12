@@ -1,45 +1,34 @@
 import getApp from '../server/index.js';
-import { fakeTask, fakeStatus, fakeUser } from './helpers/index.js';
+import { getTestData, prepareData, signIn } from './helpers/index.js';
 
 describe('test tasks CRUD', () => {
   let app;
   let knex;
   let models;
-  let status;
   let task;
-  let user;
-  let statusData;
   let testData;
-  let userData;
+  let cookies;
+  let user;
 
   beforeAll(async () => {
     app = await getApp();
     models = app.objection.models;
     knex = app.objection.knex;
-    statusData = fakeStatus();
-    testData = fakeTask();
-    userData = fakeUser();
-
-    app.addHook('preHandler', async (req) => {
-      req.user = await models.user.query().findOne({ email: user.email });
-    });
+    testData = getTestData();
   });
 
   beforeEach(async () => {
     await knex.migrate.latest();
-    user = await models.user.query().insert(userData);
-    status = await models.status.query().insert(statusData);
-    task = await models.task.query().insert({
-      ...testData,
-      creatorId: user.id,
-      executorId: user.id,
-      statusId: status.id,
-    });
+    await prepareData(app);
+    user = await models.user.query().insert(testData.users.existing);
+    task = await models.task.query().insert({ ...testData.tasks.existing, creatorId: user.id });
+    cookies = await signIn(app, testData.users.existing);
   });
 
   it('index', async () => {
     const response = await app.inject({
       method: 'GET',
+      cookies,
       url: app.reverse('tasks'),
     });
 
@@ -49,6 +38,7 @@ describe('test tasks CRUD', () => {
   it('new', async () => {
     const response = await app.inject({
       method: 'GET',
+      cookies,
       url: app.reverse('newTask'),
     });
 
@@ -58,6 +48,7 @@ describe('test tasks CRUD', () => {
   it('task info', async () => {
     const response = await app.inject({
       method: 'GET',
+      cookies,
       url: app.reverse('newTask', { id: `${task.id}` }),
     });
 
@@ -65,9 +56,27 @@ describe('test tasks CRUD', () => {
   });
 
   it('create task', async () => {
-    const newTask = fakeTask();
     const response = await app.inject({
       method: 'POST',
+      cookies,
+      url: app.reverse('tasks'),
+      payload: {
+        data: testData.tasks.new,
+      },
+    });
+
+    expect(response.statusCode).toBe(302);
+
+    const createdTask = await models.task.query().findOne({ name: testData.tasks.new.name });
+
+    expect(createdTask).not.toBeUndefined();
+  });
+
+  it('create task without executor', async () => {
+    const newTask = { ...testData.tasks.new, executorId: '' };
+    const response = await app.inject({
+      method: 'POST',
+      cookies,
       url: app.reverse('tasks'),
       payload: {
         data: newTask,
@@ -78,31 +87,34 @@ describe('test tasks CRUD', () => {
 
     const createdTask = await models.task.query().findOne({ name: newTask.name });
 
-    expect(createdTask).toMatchObject(newTask);
+    expect(createdTask).not.toBeUndefined();
   });
 
   it('edit task', async () => {
-    const { name, description } = fakeTask();
-    const newTask = { ...task, name, description };
+    const newTask = { ...testData.tasks.new, creatorId: user.id };
+
+    const { id } = await models.task.query().findOne({ name: task.name });
 
     const response = await app.inject({
       method: 'PATCH',
-      url: app.reverse('updateTask', { id: task.id }),
+      cookies,
+      url: app.reverse('updateTask', { id }),
       payload: {
-        data: { ...task, name, description },
+        data: newTask,
       },
     });
 
     expect(response.statusCode).toBe(302);
 
-    const updatedTask = await models.task.query().findById(task.id);
+    const updatedTask = await models.task.query().findOne({ name: newTask.name });
 
-    expect(updatedTask).toMatchObject(newTask);
+    expect(updatedTask).not.toBeUndefined();
   });
 
   it('delete task', async () => {
     const response = await app.inject({
       method: 'DELETE',
+      cookies,
       url: app.reverse('deleteTask', { id: task.id }),
     });
 
@@ -113,24 +125,19 @@ describe('test tasks CRUD', () => {
     expect(deletedTask).toBeUndefined();
   });
 
-  it('delete other user task', async () => {
-    const otherUserTask = await models.task.query().insert({
-      ...fakeTask(),
-      executorId: 2,
-      creatorId: 2,
-      statusId: status.id,
-    });
-
+  it('can\'t delete other user task', async () => {
+    const otherTask = await models.task.query().findById(1);
     const response = await app.inject({
       method: 'DELETE',
-      url: app.reverse('deleteTask', { id: otherUserTask.id }),
+      cookies,
+      url: app.reverse('deleteTask', { id: otherTask.id }),
     });
 
     expect(response.statusCode).toBe(302);
 
-    const undeletedTask = await models.task.query().findById(otherUserTask.id);
+    const undeletedTask = await models.task.query().findById(otherTask.id);
 
-    expect(undeletedTask).toMatchObject(otherUserTask);
+    expect(undeletedTask).toMatchObject(otherTask);
   });
 
   afterEach(async () => {

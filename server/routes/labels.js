@@ -21,10 +21,8 @@ export default async (app) => app
     })
 
   .post('/labels', async (req, reply) => {
-    const { models } = app.objection;
     try {
-      const label = await models.label.fromJson(req.body.data);
-      await models.label.query().insert(label);
+      await app.objection.models.label.query().insert(req.body.data);
 
       req.flash('info', i18next.t('flash.labels.create.success'));
       return reply.redirect(app.reverse('labels'));
@@ -35,11 +33,9 @@ export default async (app) => app
   })
 
   .patch('/labels/:id', async (req, reply) => {
-    const { models } = app.objection;
     try {
-      const currentLabel = await models.label.fromJson(req.body.data);
-      const label = await models.label.query().findById(req.params.id);
-      await label.$query().update(currentLabel);
+      const label = await app.objection.models.label.query().findById(req.params.id);
+      await label.$query().update(req.body.data);
 
       req.flash('info', i18next.t('flash.labels.update.success'));
       return reply.redirect(app.reverse('labels'));
@@ -50,15 +46,14 @@ export default async (app) => app
   })
 
   .delete('/labels/:id', { name: 'deleteLabel' }, async (req, reply) => {
-    const { models } = app.objection;
-    const tasks = await models.label
+    const tasks = await app.objection.models.label
       .relatedQuery('tasks')
       .for(req.params.id);
 
     if (tasks.length) {
       req.flash('error', i18next.t('flash.labels.delete.error'));
     } else {
-      await models.label.query().deleteById(req.params.id);
+      await app.objection.models.label.query().deleteById(req.params.id);
       req.flash('info', i18next.t('flash.labels.delete.success'));
     }
 

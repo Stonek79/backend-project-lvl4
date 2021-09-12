@@ -36,10 +36,8 @@ export default (app) => {
       })
 
     .post('/users', async (req, reply) => {
-      const { models } = app.objection;
       try {
-        const user = await models.user.fromJson(req.body.data);
-        await models.user.query().insert(user);
+        await app.objection.models.user.query().insert(req.body.data);
 
         req.flash('info', i18next.t('flash.users.create.success'));
         return reply.redirect(app.reverse('root'));
@@ -50,17 +48,15 @@ export default (app) => {
     })
 
     .patch('/users/:id', async (req, reply) => {
-      const { models } = app.objection;
       try {
-        const user = await models.user.fromJson(req.body.data);
-        const currentUser = await models.user.query().findById(req.params.id);
-        await currentUser.$query().update(user);
+        const currentUser = await app.objection.models.user.query().findById(req.params.id);
+        await currentUser.$query().update(req.body.data);
 
         req.flash('info', i18next.t('flash.users.update.success'));
         return reply.redirect(app.reverse('users'));
-      } catch ({ data }) {
+      } catch (data) {
         req.flash('error', i18next.t('flash.users.update.error'));
-        const user = await models.user.query().findById(req.params.id);
+        const user = await app.objection.models.user.query().findById(req.params.id);
 
         return reply.render('users/edit', { user, errors: data });
       }
@@ -69,20 +65,19 @@ export default (app) => {
     .delete('/users/:id',
       { name: 'deleteUser', preValidation: app.authenticate, preHandler: isAllowed },
       async (req, reply) => {
-        const { models } = app.objection;
-        const tasks = await models.task
+        const tasks = await app.objection.models.task
           .query()
           .where('executorId', req.params.id)
           .orWhere('creatorId', req.params.id);
 
         if (!tasks.length) {
-          await models.user.query().deleteById(req.params.id);
+          await app.objection.models.user.query().deleteById(req.params.id);
           req.logOut();
           req.flash('info', i18next.t('flash.users.delete.success'));
-          return reply.redirect(app.reverse('users'));
+        } else {
+          req.flash('error', i18next.t('flash.users.delete.error'));
         }
 
-        req.flash('error', i18next.t('flash.users.delete.error'));
         return reply.redirect(app.reverse('users'));
       });
 };
