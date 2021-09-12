@@ -61,6 +61,7 @@ export default async (app) => {
       const [task, statuses, tasksExecutors, labels] = await Promise.all([
         models.task
           .query()
+          .withGraphFetched('labels')
           .findById(req.params.id),
         models.status.query(),
         models.user.query(),
