@@ -32,7 +32,6 @@ exports.up = (knex) => (
 
     table
       .integer('executor_id')
-      .unsigned()
       .references('id')
       .inTable('users')
       .index()

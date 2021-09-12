@@ -54,7 +54,7 @@ export default (app) => {
 
         req.flash('info', i18next.t('flash.users.update.success'));
         return reply.redirect(app.reverse('users'));
-      } catch (data) {
+      } catch ({ data }) {
         req.flash('error', i18next.t('flash.users.update.error'));
         const user = await app.objection.models.user.query().findById(req.params.id);
 

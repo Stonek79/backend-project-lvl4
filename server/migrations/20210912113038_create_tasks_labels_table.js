@@ -13,7 +13,7 @@ exports.up = (knex) => (
       .references('id')
       .inTable('labels')
       .index()
-      .onDelete('SET NULL');
+      .onDelete('CASCADE');
 
     table
       .integer('task_id')
@@ -21,7 +21,7 @@ exports.up = (knex) => (
       .references('id')
       .inTable('tasks')
       .index()
-      .onDelete('SET NULL');
+      .onDelete('CASCADE');
 
     table
       .timestamp('created_at')
