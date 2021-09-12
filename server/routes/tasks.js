@@ -84,7 +84,7 @@ export default async (app) => {
         name: taskData.name,
         description: taskData.description,
         statusId: Number(taskData.statusId),
-        executorId: Number(taskData.executorId),
+        executorId: taskData.executorId ? Number(taskData.executorId) : null,
         creatorId: req.user.id,
         labels: labelsIds,
       };
@@ -121,7 +121,7 @@ export default async (app) => {
         name: taskData.name,
         description: taskData.description,
         statusId: Number(taskData.statusId),
-        executorId: Number(taskData.executorId),
+        executorId: taskData.executorId ? Number(taskData.executorId) : null,
         creatorId: req.user.id,
         labels: labelsIds,
       };
