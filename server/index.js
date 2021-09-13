@@ -121,7 +121,6 @@ const registerPlugins = (app) => {
       failureRedirect: app.reverse('root'),
       failureFlash: i18next.t('flash.authError'),
     },
-  // @ts-ignore
   )(...args));
 
   app.register(fastifyMethodOverride);

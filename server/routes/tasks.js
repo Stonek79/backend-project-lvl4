@@ -97,7 +97,6 @@ export default async (app) => {
         req.flash('info', i18next.t('flash.tasks.create.success'));
         return reply.redirect(app.reverse('tasks'));
       } catch ({ data }) {
-        console.log(data);
         req.flash('error', i18next.t('flash.tasks.create.error'));
         const [statuses, executors, lbels] = await Promise.all([
           models.status.query(),
@@ -116,6 +115,7 @@ export default async (app) => {
       const { models } = await app.objection;
       const { labels = [], ...taskData } = req.body.data;
       const labelsIds = [labels].flat().map((label) => ({ id: Number(label) }));
+      const { creatorId } = await models.task.query().findById(req.params.id);
 
       const currentTask = {
         id: Number(req.params.id),
@@ -123,7 +123,7 @@ export default async (app) => {
         description: taskData.description,
         statusId: Number(taskData.statusId),
         executorId: taskData.executorId ? Number(taskData.executorId) : null,
-        creatorId: req.user.id,
+        creatorId,
         labels: labelsIds,
       };
 
