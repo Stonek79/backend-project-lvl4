@@ -89,11 +89,16 @@ export default async (app) => {
       };
 
       try {
-        await models.task.transaction((trx) => models.task.query(trx).insertGraph(currentTask));
+        await models.task.transaction((trx) => (
+          models.task.query(trx).upsertGraph(currentTask,
+            { relate: true, unrelate: true, noUpdate: ['labels'] },
+          )
+        ));
 
         req.flash('info', i18next.t('flash.tasks.create.success'));
         return reply.redirect(app.reverse('tasks'));
       } catch ({ data }) {
+        console.log(data);
         req.flash('error', i18next.t('flash.tasks.create.error'));
         const [statuses, executors, lbels] = await Promise.all([
           models.status.query(),
