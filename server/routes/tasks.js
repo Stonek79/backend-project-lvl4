@@ -90,7 +90,7 @@ export default async (app) => {
 
       try {
         await models.task.transaction((trx) => {
-          const createdTask = models.task.query(trx).upsertGraph(currentTask);
+          const createdTask = models.task.query(trx).insertGraph(currentTask);
           return createdTask;
         });
 
