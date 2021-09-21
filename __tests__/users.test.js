@@ -23,7 +23,7 @@ describe('test users CRUD', () => {
   beforeEach(async () => {
     await knex.migrate.latest();
     await prepareData(app);
-    user = await models.user.query().insert(testData.users.existing);
+    user = await models.user.query().findOne({ email: testData.users.existing.email });
     cookies = await signIn(app, testData.users.existing);
   });
 
@@ -53,7 +53,6 @@ describe('test users CRUD', () => {
       payload: {
         data: newUser,
       },
-      cookies,
     });
 
     expect(response.statusCode).toBe(302);
@@ -109,7 +108,6 @@ describe('test users CRUD', () => {
       payload: {
         data: { ...newUser, firstName: '', lastName: '' },
       },
-      cookies,
     });
 
     expect(response.statusCode).toBe(200);
@@ -127,7 +125,6 @@ describe('test users CRUD', () => {
       payload: {
         data: { ...newUser, email: user.email },
       },
-      cookies,
     });
 
     expect(response.statusCode).toBe(200);

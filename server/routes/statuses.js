@@ -16,7 +16,6 @@ export default (app) => app
     })
 
   .get('/statuses/:id/edit',
-    { name: 'editStatus', preValidation: app.authenticate },
     async (req, reply) => {
       const status = await app.objection.models.status.query().findById(req.params.id);
       return reply.render('statuses/edit', { status });

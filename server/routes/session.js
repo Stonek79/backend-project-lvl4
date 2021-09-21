@@ -4,8 +4,7 @@ import i18next from 'i18next';
 
 export default (app) => app
   .get('/session/new', { name: 'newSession' }, (_req, reply) => {
-    const signInForm = {};
-    reply.render('session/new', { signInForm });
+    reply.render('session/new');
   })
   .post('/session', { name: 'session' }, app.fp.authenticate('form', async (req, reply, err, user) => {
     if (err) {

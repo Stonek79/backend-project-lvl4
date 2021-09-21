@@ -1,5 +1,5 @@
 import getApp from '../server/index.js';
-import { getTestData } from './helpers/index.js';
+import { getTestData, prepareData, signIn } from './helpers/index.js';
 
 describe('test labels CRUD', () => {
   let app;
@@ -7,6 +7,7 @@ describe('test labels CRUD', () => {
   let label;
   let models;
   let testData;
+  let cookies;
 
   beforeAll(async () => {
     app = await getApp();
@@ -17,12 +18,15 @@ describe('test labels CRUD', () => {
 
   beforeEach(async () => {
     await knex.migrate.latest();
-    label = await models.label.query().insert(testData.labels.existing);
+    await prepareData(app);
+    label = await models.label.query().findOne({ name: testData.labels.existing.name });
+    cookies = await signIn(app, testData.users.existing);
   });
 
   it('index', async () => {
     const response = await app.inject({
       method: 'GET',
+      cookies,
       url: app.reverse('labels'),
     });
 
@@ -32,6 +36,7 @@ describe('test labels CRUD', () => {
   it('new', async () => {
     const response = await app.inject({
       method: 'GET',
+      cookies,
       url: app.reverse('newLabel'),
     });
 
@@ -43,6 +48,7 @@ describe('test labels CRUD', () => {
 
     const response = await app.inject({
       method: 'POST',
+      cookies,
       url: app.reverse('labels'),
       payload: {
         data: newLabel,
@@ -61,6 +67,7 @@ describe('test labels CRUD', () => {
 
     const response = await app.inject({
       method: 'PATCH',
+      cookies,
       url: `/labels/${label.id}`,
       payload: {
         data: newLabel,
@@ -77,6 +84,7 @@ describe('test labels CRUD', () => {
   it('delete label', async () => {
     const response = await app.inject({
       method: 'DELETE',
+      cookies,
       url: app.reverse('deleteLabel', { id: label.id }),
     });
 
@@ -93,6 +101,7 @@ describe('test labels CRUD', () => {
 
     const response = await app.inject({
       method: 'DELETE',
+      cookies,
       url: app.reverse('deleteLabel', { id: label.id.toString() }),
     });
 

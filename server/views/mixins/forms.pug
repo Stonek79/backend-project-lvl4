@@ -59,6 +59,36 @@ mixin select(entityes, task, propertyName, label, errors = {}, multiple = false)
     if !_.isEmpty(propertyErrors && inputId)
       .invalid-feedback= propertyErrors.map(({ message }) => message).join('. ')
 
+mixin tasksFilter(entityes, filter, propertyName, label)
+  - inputId = getInputId(propertyName)
+  - isSelected = (entity) => filter === entity.id.toString()
+  .col.mb-3
+    label(for= inputId)= label
+    select(
+      id= inputId
+      name=propertyName
+      class='form-control'
+    )&attributes(attributes).ml-2.mr-3
+      option
+      each entity in entityes
+        option(
+          value=entity.id
+          selected= isSelected(entity)
+        )= entity.name
+
+mixin filterByCreator(filter, propertyName, label)
+  - inputId = getInputId(propertyName)
+  - isChecked = Boolean(filter)
+  .mb-3.form-check
+    input(
+      id=inputId
+      name=propertyName
+      type='checkbox'
+      class='form-check-input'
+      checked=isChecked
+    )
+    label(for= inputId)= label
+
 mixin submit(form = null)
   input(class='btn btn-primary' type='submit')&attributes(attributes).mt-2
 

@@ -14,7 +14,6 @@ export default async (app) => app
     })
 
   .get('/labels/:id/edit',
-    { name: 'editLabel', preValidation: app.authenticate },
     async (req, reply) => {
       const label = await app.objection.models.label.query().findById(req.params.id);
       return reply.render('labels/edit', { label });

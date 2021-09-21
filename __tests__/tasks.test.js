@@ -8,7 +8,6 @@ describe('test tasks CRUD', () => {
   let task;
   let testData;
   let cookies;
-  let user;
 
   beforeAll(async () => {
     app = await getApp();
@@ -20,8 +19,7 @@ describe('test tasks CRUD', () => {
   beforeEach(async () => {
     await knex.migrate.latest();
     await prepareData(app);
-    user = await models.user.query().insert(testData.users.existing);
-    task = await models.task.query().insert({ ...testData.tasks.existing, creatorId: user.id });
+    task = await models.task.query().findOne({ name: testData.tasks.existing.name });
     cookies = await signIn(app, testData.users.existing);
   });
 
@@ -91,7 +89,7 @@ describe('test tasks CRUD', () => {
   });
 
   it('edit task', async () => {
-    const newTask = { ...testData.tasks.new, creatorId: user.id };
+    const newTask = { ...testData.tasks.new };
 
     const { id } = await models.task.query().findOne({ name: task.name });
 
@@ -115,7 +113,7 @@ describe('test tasks CRUD', () => {
     const response = await app.inject({
       method: 'DELETE',
       cookies,
-      url: app.reverse('deleteTask', { id: task.id }),
+      url: app.reverse('deleteTask', { id: `${task.id}` }),
     });
 
     expect(response.statusCode).toBe(302);
@@ -135,7 +133,7 @@ describe('test tasks CRUD', () => {
 
     expect(response.statusCode).toBe(302);
 
-    const undeletedTask = await models.task.query().findById(otherTask.id);
+    const undeletedTask = await models.task.query().findOne({ creatorId: otherTask.creatorId });
 
     expect(undeletedTask).toMatchObject(otherTask);
   });

@@ -24,6 +24,10 @@ export default class User extends unique(BaseModel) {
     };
   }
 
+  get name() {
+    return `${this.firstName} ${this.lastName}`;
+  }
+
   static relationMappings = {
     executedTasks: {
       relation: BaseModel.HasManyRelation,

@@ -1,5 +1,5 @@
 import getApp from '../server/index.js';
-import { getTestData } from './helpers/index.js';
+import { getTestData, prepareData, signIn } from './helpers/index.js';
 
 describe('test statuses CRUD', () => {
   let app;
@@ -7,6 +7,7 @@ describe('test statuses CRUD', () => {
   let status;
   let models;
   let testData;
+  let cookies;
 
   beforeAll(async () => {
     app = await getApp();
@@ -17,12 +18,15 @@ describe('test statuses CRUD', () => {
 
   beforeEach(async () => {
     await knex.migrate.latest();
-    status = await models.status.query().insert(testData.statuses.existing);
+    await prepareData(app);
+    status = await models.status.query().findOne({ name: testData.statuses.existing.name });
+    cookies = await signIn(app, testData.users.existing);
   });
 
   it('index', async () => {
     const response = await app.inject({
       method: 'GET',
+      cookies,
       url: app.reverse('statuses'),
     });
 
@@ -32,6 +36,7 @@ describe('test statuses CRUD', () => {
   it('new', async () => {
     const response = await app.inject({
       method: 'GET',
+      cookies,
       url: '/statuses/new',
     });
 
@@ -43,6 +48,7 @@ describe('test statuses CRUD', () => {
 
     const response = await app.inject({
       method: 'POST',
+      cookies,
       url: app.reverse('statuses'),
       payload: {
         data: newStatus,
@@ -61,6 +67,7 @@ describe('test statuses CRUD', () => {
 
     const response = await app.inject({
       method: 'PATCH',
+      cookies,
       url: app.reverse('patchStatus', { id: status.id }),
       payload: {
         data: newStatus,
@@ -77,12 +84,13 @@ describe('test statuses CRUD', () => {
   it('delete status', async () => {
     const response = await app.inject({
       method: 'DELETE',
-      url: app.reverse('deleteStatus', { id: status.id.toString() }),
+      cookies,
+      url: app.reverse('deleteStatus', { id: status.id }),
     });
 
     expect(response.statusCode).toBe(302);
 
-    const deletedStatus = await models.label.query().findById(status.id);
+    const deletedStatus = await models.status.query().findById(status.id);
 
     expect(deletedStatus).toBeUndefined();
   });
@@ -95,6 +103,7 @@ describe('test statuses CRUD', () => {
 
     const response = await app.inject({
       method: 'DELETE',
+      cookies,
       url: app.reverse('deleteStatus', { id: status.id.toString() }),
     });
 

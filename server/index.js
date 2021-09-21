@@ -141,14 +141,13 @@ export default () => {
     },
   });
 
+  setupRollbar(app);
   registerPlugins(app);
   setupLocalization();
   setUpViews(app);
   setUpStaticAssets(app);
   addHooks(app);
-  setupRollbar(app);
 
   app.after(() => addRoutes(app));
-
   return app;
 };
