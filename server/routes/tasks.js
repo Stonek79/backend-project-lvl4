@@ -4,7 +4,7 @@ import normalizeMultiSelect from '../lib/normalizeMultiSelect';
 
 export default async (app) => {
   app
-    .get('/tasks', { name: 'tasks' }, async (req, reply) => {
+    .get('/tasks', { name: 'tasks', preValidation: app.authenticate }, async (req, reply) => {
       const { models } = app.objection;
 
       const { executor, label, status } = _.pickBy(req.query, (q) => q.length);
@@ -31,7 +31,7 @@ export default async (app) => {
       });
     })
 
-    .get('/tasks/new', { name: 'newTask' }, async (_req, reply) => {
+    .get('/tasks/new', { name: 'newTask', preValidation: app.authenticate }, async (_req, reply) => {
       const { models } = app.objection;
 
       const [task, executors, statuses, labels] = await Promise.all([
@@ -46,7 +46,7 @@ export default async (app) => {
       });
     })
 
-    .get('/tasks/:id', { name: 'taskInfo' }, async (req, reply) => {
+    .get('/tasks/:id', { name: 'taskInfo', preValidation: app.authenticate }, async (req, reply) => {
       const task = await app.objection.models.task
         .query()
         .withGraphFetched('[status, creator, executor, labels]')

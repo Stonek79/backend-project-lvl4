@@ -1,19 +1,20 @@
 import i18next from 'i18next';
 
 export default async (app) => app
-  .get('/labels', { name: 'labels' }, async (_req, reply) => {
+  .get('/labels', { name: 'labels', preValidation: app.authenticate }, async (_req, reply) => {
     const labels = await app.objection.models.label.query();
     return reply.render('labels/index', { labels });
   })
 
   .get('/labels/new',
-    { name: 'newLabel' },
+    { name: 'newLabel', preValidation: app.authenticate },
     (_req, reply) => {
       const label = new app.objection.models.label();
       return reply.render('labels/new', { label });
     })
 
   .get('/labels/:id/edit',
+    { preValidation: app.authenticate },
     async (req, reply) => {
       const label = await app.objection.models.label.query().findById(req.params.id);
       return reply.render('labels/edit', { label });

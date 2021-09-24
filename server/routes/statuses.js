@@ -3,19 +3,20 @@
 import i18next from 'i18next';
 
 export default (app) => app
-  .get('/statuses', { name: 'statuses' }, async (_req, reply) => {
+  .get('/statuses', { name: 'statuses', preValidation: app.authenticate }, async (_req, reply) => {
     const statuses = await app.objection.models.status.query();
     return reply.render('statuses/index', { statuses });
   })
 
   .get('/statuses/new',
-    { name: 'newStatus' },
+    { name: 'newStatus', preValidation: app.authenticate },
     (_req, reply) => {
       const status = new app.objection.models.status();
       return reply.render('statuses/new', { status });
     })
 
   .get('/statuses/:id/edit',
+    { preValidation: app.authenticate },
     async (req, reply) => {
       const status = await app.objection.models.status.query().findById(req.params.id);
       return reply.render('statuses/edit', { status });

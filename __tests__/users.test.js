@@ -40,6 +40,7 @@ describe('test users CRUD', () => {
     const response = await app.inject({
       method: 'GET',
       url: app.reverse('newUser'),
+      cookies,
     });
 
     expect(response.statusCode).toBe(200);
