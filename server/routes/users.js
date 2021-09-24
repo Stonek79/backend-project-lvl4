@@ -17,7 +17,7 @@ export default (app) => {
     })
 
     .get('/users/new',
-      { name: 'newUser', preValidation: app.authenticate },
+      { name: 'newUser' },
       (_req, reply) => {
         const user = new app.objection.models.user();
         return reply.render('users/new', { user });
