@@ -2,9 +2,10 @@ import i18next from 'i18next';
 import _ from 'lodash';
 import normalizeMultiSelect from '../lib/normalizeMultiSelect';
 
-export default async (app) => {
-  app
-    .get('/tasks', { name: 'tasks', preValidation: app.authenticate }, async (req, reply) => {
+export default async (app) => app
+  .get('/tasks',
+    { name: 'tasks', preValidation: app.authenticate },
+    async (req, reply) => {
       const { models } = app.objection;
 
       const { executor, label, status } = _.pickBy(req.query, (q) => q.length);
@@ -31,7 +32,9 @@ export default async (app) => {
       });
     })
 
-    .get('/tasks/new', { name: 'newTask', preValidation: app.authenticate }, async (_req, reply) => {
+  .get('/tasks/new',
+    { name: 'newTask', preValidation: app.authenticate },
+    async (_req, reply) => {
       const { models } = app.objection;
 
       const [task, executors, statuses, labels] = await Promise.all([
@@ -46,7 +49,9 @@ export default async (app) => {
       });
     })
 
-    .get('/tasks/:id', { name: 'taskInfo', preValidation: app.authenticate }, async (req, reply) => {
+  .get('/tasks/:id',
+    { name: 'taskInfo', preValidation: app.authenticate },
+    async (req, reply) => {
       const task = await app.objection.models.task
         .query()
         .withGraphFetched('[status, creator, executor, labels]')
@@ -55,9 +60,8 @@ export default async (app) => {
       return reply.render('tasks/info', { task });
     })
 
-    .get('/tasks/:id/edit', {
-      name: 'editTask', preValidation: app.authenticate,
-    }, async (req, reply) => {
+  .get('/tasks/:id/edit', { name: 'editTask', preValidation: app.authenticate },
+    async (req, reply) => {
       const { models } = app.objection;
       const [task, statuses, executors, labels] = await Promise.all([
         models.task
@@ -74,7 +78,9 @@ export default async (app) => {
       });
     })
 
-    .post('/tasks', async (req, reply) => {
+  .post('/tasks',
+    { preValidation: app.authenticate },
+    async (req, reply) => {
       const { models } = app.objection;
       const { labels = [], ...taskData } = req.body.data;
       const labelsIds = normalizeMultiSelect(labels);
@@ -111,7 +117,9 @@ export default async (app) => {
       }
     })
 
-    .patch('/tasks/:id', { name: 'updateTask' }, async (req, reply) => {
+  .patch('/tasks/:id',
+    { name: 'updateTask', preValidation: app.authenticate },
+    async (req, reply) => {
       const { models } = app.objection;
       const { labels = [], ...taskData } = req.body.data;
       const labelsIds = normalizeMultiSelect(labels);
@@ -150,7 +158,9 @@ export default async (app) => {
       }
     })
 
-    .delete('/tasks/:id', { name: 'deleteTask' }, async (req, reply) => {
+  .delete('/tasks/:id',
+    { name: 'deleteTask', preValidation: app.authenticate },
+    async (req, reply) => {
       const { models } = app.objection;
       const task = await models.task
         .query()
@@ -166,4 +176,3 @@ export default async (app) => {
 
       reply.redirect(app.reverse('tasks'));
     });
-};
